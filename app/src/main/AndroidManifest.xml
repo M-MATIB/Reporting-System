@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher_ucrs"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_ucrs_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.UCRS">
+        <activity
+            android:name=".Admin_ResolvedReports"
+            android:exported="false" />
+        <activity
+            android:name=".Admin_InProgressReports"
+            android:exported="false" />
+        <activity
+            android:name=".Admin_PendingReports"
+            android:exported="false" />
+        <activity
+            android:name=".Admin_NewReports"
+            android:exported="false" />
+        <activity
+            android:name=".StaffHomepage"
+            android:exported="false" />
+        <activity
+            android:name=".ChangePass"
+            android:exported="false" />
+        <activity
+            android:name=".Settings"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.UCRS">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".StudentRegistrationActivity"
+            android:exported="false"
+            android:label="Student Registration"
+            android:theme="@style/Theme.UCRS" />
+
+        <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="android:screenOrientation" />
+
+        <activity
+            android:name=".StaffRegistrationActivity"
+            android:exported="false"
+            android:label="Staff Registration"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".StudentHomeActivity"
+            android:exported="false"
+            android:label="Home"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
+        <activity
+            android:name=".AboutUsActivity"
+            android:exported="false"
+            android:label="About Us"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".StudentProfileActivity"
+            android:exported="false"
+            android:label="Student Profile"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".EditInputActivity"
+            android:exported="false"
+            android:label=""
+            android:theme="@style/Theme.UCRS.NoTitleDialog" />
+        <activity
+            android:name=".EditConfirmationActivity"
+            android:exported="false"
+            android:label=""
+            android:theme="@style/Theme.UCRS.NoTitleDialog" />
+        <activity
+            android:name=".IncidentReportActivity"
+            android:exported="false"
+            android:label="New Incident Report"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".MedicalEmergencyActivity"
+            android:exported="false"
+            android:label="Medical Emergency Report"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".MissingBrokenItemActivity"
+            android:exported="false"
+            android:label="Missing/Broken Item Report"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".OtherReportActivity"
+            android:exported="false"
+            android:label="Other Report"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".ReportConfirmationActivity"
+            android:exported="false"
+            android:label="Report Confirmation"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".ReportHistoryActivity"
+            android:exported="false"
+            android:label="Incident Report"
+            android:theme="@style/Theme.UCRS" />
+        <activity
+            android:name=".NotificationActivity"
+            android:exported="false"
+            android:label=""
+            android:theme="@style/Theme.UCRS" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "155719361237",
+    "firebase_url": "https://fir-firestore-cc456-default-rtdb.firebaseio.com",
+    "project_id": "fir-firestore-cc456",
+    "storage_bucket": "fir-firestore-cc456.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155719361237:android:7504c22cdf4056f5c8385c",
+        "android_client_info": {
+          "package_name": "com.example.ucreportingsystem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxlaS03Zr_zkHm04soTP-XPjlHfJGaddQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

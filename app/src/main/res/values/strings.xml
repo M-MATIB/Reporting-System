@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">UCRS</string>
+    <string name="university_logo">University of the Cordilleras</string>
+    <string name="uc_reporting">UC Reporting</string>
+    <string name="system">System</string>
+    <string name="welcome_back">Welcome back!</string>
+    <string name="please_sign_in">Please sign in to continue.</string>
+    <string name="email_hint">"@uc-bcf.edu.ph"</string>
+    <string name="password_hint">password</string>
+    <string name="login">Login</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="create_account"><u>Create Account</u></string>
+    <string name="emergency_report"><u>Emergency Report</u></string>
+    <string name="select_role">Select your role to view required fields.</string>
+    <string name="student_registration">Student Registration</string>
+    <string name="complete_registration">Complete Registration</string>
+    <string name="go_to_login"><u>Go to Login</u></string>
+    <string name="staff_registration">Staff Registration</string>
+    <string name="success_message">Thank you <b>Jose Rizal</b>, for submitting this critical information.</string>
+    <string name="label_report_id">Report ID</string>
+    <string name="label_type">Type:</string>
+    <string name="label_location">Location:</string>
+    <string name="label_submitted">Submitted:</string>
+    <string name="button_view_details">View Details →</string>
+    <string name="back">Back</string>
+    <string name="mission">Mission</string>
+    <string name="purpose">Purpose</string>
+    <string name="vision">Vision</string>
+    <string name="back_icon">Back Icon</string>
+    <string name="ucrs_logo">UCRS Logo</string>
+    <string name="menu">Menu</string>
+    <string name="about_us_description">Our app is designed to give students a reliable and efficient way to voice their concerns. By providing a secure and accessible platform, we aim to bridge the gap between students and school authorities, ensuring that every concern is heard, addressed promptly, and handled with care.</string>
+    <string name="about_us">ABOUT US</string>
+    <string name="our_purpose">To enable students to efficiently report their concerns through a reliable digital platform.</string>
+    <string name="our_purpose_title">Our Purpose</string>
+    <string name="back_button">back button</string>
+    <string name="back_edit_conf">Back</string>
+    <string name="wish_to_change_it">This is your current email.\nDo you wish to change it?</string>
+    <string name="change_email">Change Email</string>
+    <string name="field_icon">Field icon</string>
+    <string name="button_back">back_button</string>
+    <string name="save_value">Save Value</string>
+    <string name="hint_value">e.g., confirm.value.here</string>
+    <string name="confirm_hint">e.g., your.value.here</string>
+    <string name="field_edit_icon">Field edit icon</string>
+    <string name="select_location">Select Location</string>
+    <string name="select_office">Select Office</string>
+    <string name="incident_report">Incident Report</string>
+    <string name="detail_ir">Provide details for the incident report.</string>
+    <string name="title">Title</string>
+    <string name="location_area">Location/Area *</string>
+    <string name="description_of_issue">Description of Issue *</string>
+    <string name="recommended_office">Recommended Office:</string>
+    <string name="send_report_to">Send report to</string>
+    <string name="upload_image_file">Upload Image/File (Optional)</string>
+    <string name="capture_photo">Capture Photo</string>
+    <string name="submit_report">Submit Report</string>
+    <string name="upload_file">Upload File</string>
+    <string name="describe_the_issue_in_detail">Describe the issue in detail...</string>
+    <string name="itss">ITSS</string>
+    <string name="select_office_department">Select Office/Department</string>
+    <string name="roon_num">Room #</string>
+    <string name="public_toggle">Public</string>
+    <string name="privat">Private</string>
+    <string name="brief_summary_of_the_issue">Brief summary of the issue</string>
+
+    <string name="new_reports">New Reports</string>
+    <string name="pending">Pending</string>
+
+
+    <string-array name="office_departments_array">
+        <item>CITCS</item>
+        <item>COA</item>
+        <item>CON</item>
+        <item>CEA</item>
+        <item>CTE</item>
+        <item>CAS</item>
+        <item>CHTM</item>
+        <item>COL</item>
+        <item>CBA</item>
+    </string-array>
+
+</resources>

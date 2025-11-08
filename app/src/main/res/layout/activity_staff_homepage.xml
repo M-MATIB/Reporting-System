@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start"
+    tools:context=".StaffHomepage">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/olive_green">
+
+        <View
+            android:id="@+id/v_header_background"
+            android:layout_width="0dp"
+            android:layout_height="105dp"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_menu_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="50dp"
+            android:contentDescription="Menu"
+            android:src="@drawable/menu_icon"
+            app:tint="@color/uc_green"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginTop="40dp"
+            android:contentDescription="UC Logo"
+            android:src="@drawable/uc_logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="200dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="70dp"
+                    android:layout_marginEnd="70dp"
+                    android:id="@+id/btn_NewReports"
+                    android:backgroundTint="#E0E0E0"
+                    android:text="@string/new_reports"
+                    android:textColor="@color/black"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/btn_Pending" />
+
+                <Button
+                    style="@style/DashboardButton"
+                    android:id="@+id/btn_Pending"
+                    android:backgroundTint="@color/pending_bg"
+                    android:text="@string/pending"
+                    android:layout_marginTop="50dp"
+                    app:layout_constraintTop_toBottomOf="@id/btn_NewReports"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/btn_InProgress"/>
+
+                <Button
+                    style="@style/DashboardButton"
+                    android:id="@+id/btn_InProgress"
+                    android:backgroundTint="@color/in_progress_bg"
+                    android:text="@string/in_progress"
+                    android:layout_marginTop="15dp"
+                    app:layout_constraintTop_toBottomOf="@id/btn_Pending"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/btn_Resolved"/>
+
+                <Button
+                    style="@style/DashboardButton"
+                    android:id="@+id/btn_Resolved"
+                    android:backgroundTint="@color/resolved_bg"
+                    android:text="Resolved"
+                    android:layout_marginTop="15dp"
+                    app:layout_constraintTop_toBottomOf="@id/btn_InProgress"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="20dp"
+        android:fitsSystemWindows="true"
+        android:background="@color/pale_yellow"
+        android:theme="@style/SubmenuTitle"
+        app:headerLayout="@layout/nav_header_student"
+        app:menu="@menu/drawer_menu"
+        app:itemIconTint="@color/uc_green"
+        app:itemTextColor="@color/uc_green"
+        app:itemIconPadding="24dp"
+        app:itemTextAppearance="@style/NavigationDrawerTextStyle"/>
+</androidx.drawerlayout.widget.DrawerLayout>

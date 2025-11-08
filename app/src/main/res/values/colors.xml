@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="pale_yellow">#FAF7E6</color>
+    <color name="capture_upload_button">#D9D9D9</color>
+    <color name="dark_yellow">#AFADA1</color>
+    <color name="light_grey">#9C9C9C</color>
+    <color name="dark_grey">#666666</color>
+    <color name="ashy_cyan">#DBDFDD</color>
+    <color name="bright_green">#15B300</color>
+    <color name="olive_green">#43683E</color>
+    <color name="forest_green">#254136</color>
+    <color name="search_green">#5F746C</color>
+    <color name="cool_green">#9EABA6</color>
+    <color name="search_container_green">#B1BCB8</color>
+    <color name="uc_green">#0D2C20</color>
+    <color name="bright_red">#FF0000</color>
+    <color name="black">#000000</color>
+    <color name="card_background">#1A000000</color>
+    <color name="incident_report">#B91C1C</color>
+    <color name="incident_report_bg">#EABBBB</color>
+    <color name="medical_emergency">#BE185D</color>
+    <color name="medical_emergency_bg">#EBBACE</color>
+    <color name="missing_broken">#A16207</color>
+    <color name="missing_broken_bg">#E3D0B5</color>
+    <color name="other_reports">#4338CA</color>
+    <color name="other_reports_bg">#C7C3EF</color>
+    <color name="uc_red">#BF0000</color>
+
+    <color name="public_text">#EF4444</color>
+    <color name="pending">#8D581A</color>
+    <color name="pending_bg">#FEF9C3</color>
+    <color name="in_progress">#2A4BB4</color>
+    <color name="in_progress_bg">#DBEAFE</color>
+    <color name="resolved">#176635</color>
+    <color name="resolved_bg">#DCFCE7</color>
+    <color name="public_bg">#FEF2F2</color>
+    <color name="public_icon_bg">#F4E7E7</color>
+
+    <color name="pending_card">#F8F4EE</color>
+    <color name="in_progress_card">#F0F2FA</color>
+    <color name="resolved_card">#EFF4F1</color>
+
+    <color name="cream_background">#FFFDD0</color>
+
+
+
+
+
+</resources>
