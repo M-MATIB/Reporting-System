@@ -76,7 +76,9 @@ dependencies {
 
     //Provided by Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
+
 
     //QR code scanner dependency
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")

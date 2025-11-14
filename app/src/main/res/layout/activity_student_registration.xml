@@ -122,7 +122,7 @@
         android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_edittext"
         android:fontFamily="@font/montserrat_light_italic"
-        android:hint="School Email (@uc-bcf.edu)"
+        android:hint="Create Username"
         android:inputType="textEmailAddress"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"

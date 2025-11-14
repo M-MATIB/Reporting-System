@@ -14,6 +14,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.example.ucreportingsystem.R
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 
 data class Staff(
@@ -25,13 +26,16 @@ data class Staff(
 
 class StaffRegistrationActivity : AppCompatActivity() {
 
-
+    //View Declaration
     private lateinit var StaffName: EditText
     private lateinit var SchoolEmail: EditText
     private lateinit var CreatePassword: EditText
     private lateinit var ConfirmPassword: EditText
     private lateinit var Register: Button
     private var selectedOffice: String? = null
+
+    //To access cloud Firestore
+    val db = Firebase.firestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,9 +133,33 @@ class StaffRegistrationActivity : AppCompatActivity() {
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }
             else {
-                //
+                AddStaffToFirestore(Staff_Name, School_Email, Confirm_Password, Staff_Office)
+                Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
+                navigateToLogin()
             }
         }
+    }
+
+    private fun AddStaffToFirestore(
+        StaffName: String,
+        SchoolEmail: String,
+        ConfirmPassword: String,
+        StaffOffice: String
+    ){
+        val staff = hashMapOf(
+            "Name" to StaffName,
+            "Email" to SchoolEmail,
+            "Password" to ConfirmPassword,
+            "Office" to StaffOffice,
+        )
+        db.collection("Staff")
+            .add(staff)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
     }
 
 }
