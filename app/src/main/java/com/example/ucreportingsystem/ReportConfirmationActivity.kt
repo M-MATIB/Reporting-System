@@ -19,8 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import java.util.UUID
-import com.example.ucreportingsystem.StudentProfileActivity.Companion.EXTRA_LOGIN_EMAIL
-import com.example.ucreportingsystem.StudentProfileActivity.Companion.EXTRA_LOGIN_PASSWORD
+
 
 class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -284,7 +283,7 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
             }
             R.id.nav_profile -> {
                 val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                    putExtra(EXTRA_LOGIN_EMAIL, emailToPass)
+                    //putExtra(EXTRA_LOGIN_EMAIL, emailToPass)
                     putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
                 }
                 startActivity(intent)

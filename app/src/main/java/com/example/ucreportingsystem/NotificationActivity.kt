@@ -35,9 +35,9 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
 
         drawerLayout = findViewById(R.id.drawer_layout)
 
-        loggedInEmail = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL)
-            ?: intent.getStringExtra(StudentHomeActivity.EXTRA_USER_EMAIL) ?: ""
-        loggedInPassword = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD) ?: ""
+        //loggedInEmail = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL)
+            //?: intent.getStringExtra(StudentHomeActivity.EXTRA_USER_EMAIL) ?: ""
+        //loggedInPassword = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD) ?: ""
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_notifications)
         allNotifications = createSampleNotifications()
@@ -203,8 +203,8 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
 
             R.id.nav_profile -> {
                 intent = Intent(this, StudentProfileActivity::class.java).apply {
-                    putExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL, loggedInEmail)
-                    putExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD, loggedInPassword)
+                    //putExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL, loggedInEmail)
+                    //putExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD, loggedInPassword)
                 }
                 startActivity(intent)
             }

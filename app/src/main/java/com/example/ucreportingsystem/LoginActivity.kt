@@ -1,9 +1,7 @@
 package com.example.ucreportingsystem
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -56,7 +54,26 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            searchUserInCollections(enteredEmail, enteredPassword)
+            UserRepository.fetchUser(enteredEmail, enteredPassword) { userRole ->
+                when (userRole) {
+                    "Student" -> {
+                        Toast.makeText(this, "Student login successful", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, StudentHomeActivity::class.java)
+                        startActivity(intent)
+                        finish() // Finish LoginActivity so user can't go back
+                    }
+                    "Staff" -> {
+                        Toast.makeText(this, "Staff login successful", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, StaffHomepage::class.java)
+                        startActivity(intent)
+                        finish() // Finish LoginActivity
+                    }
+                    else -> {
+                        // This block runs if userRole is null (login failed)
+                        Toast.makeText(this, "Login failed. Invalid credentials or network error.", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
 
         }
     }
@@ -65,53 +82,6 @@ class LoginActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_emergency_report).setOnClickListener {
             Toast.makeText(this, "Starting Emergency Report flow...", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun searchUserInCollections(enteredEmail:String, enteredPassword:String) {
-        // First, search in the "Student" collection
-        db.collection("Student")
-            .whereEqualTo("Email", enteredEmail)
-            .whereEqualTo("Password", enteredPassword)
-            .get()
-            .addOnSuccessListener { studentResult ->
-                if (!studentResult.isEmpty) {
-                    // User found in Student collection
-                    Toast.makeText(this, "Student login successful", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, StudentHomeActivity::class.java)
-                    startActivity(intent)
-                    finish() // Optional: Finish LoginActivity so user can't go back
-                } else {
-                    // If not found in Student, search in the "Staff" collection
-                    searchInStaffCollection(enteredEmail, enteredPassword)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents from Student collection.", exception)
-                Toast.makeText(this, "An error occurred during login.", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun searchInStaffCollection(enteredEmail: String, enteredPassword: String) {
-        db.collection("Staff")
-            .whereEqualTo("Email", enteredEmail)
-            .whereEqualTo("Password", enteredPassword)
-            .get()
-            .addOnSuccessListener { staffResult ->
-                if (!staffResult.isEmpty) {
-                    // User found in Staff collection
-                    Toast.makeText(this, "Staff login successful", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, StaffHomepage::class.java)
-                    startActivity(intent)
-                    finish() // Optional: Finish LoginActivity
-                } else {
-                    // User not found in either collection
-                    Toast.makeText(this, "Login failed. Invalid credentials.", Toast.LENGTH_LONG).show()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents from Staff collection.", exception)
-                Toast.makeText(this, "An error occurred during login.", Toast.LENGTH_SHORT).show()
-            }
     }
 
 }

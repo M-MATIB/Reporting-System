@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.TypedValue
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -22,13 +21,6 @@ import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.example.ucreportingsystem.StudentHomeActivity
-import com.example.ucreportingsystem.StudentProfileActivity
-import com.example.ucreportingsystem.AboutUsActivity
-import com.example.ucreportingsystem.LoginActivity
-import com.example.ucreportingsystem.ReportConfirmationActivity.Companion.EXTRA_USER_EMAIL
-import com.example.ucreportingsystem.StudentProfileActivity.Companion.EXTRA_LOGIN_EMAIL
-import com.example.ucreportingsystem.StudentProfileActivity.Companion.EXTRA_LOGIN_PASSWORD
 
 
 class MedicalEmergencyActivity : AppCompatActivity() {
@@ -128,7 +120,7 @@ class MedicalEmergencyActivity : AppCompatActivity() {
                 }
                 R.id.nav_profile -> {
                     val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                        putExtra(EXTRA_LOGIN_EMAIL, emailToPass)
+
                         putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
                     }
                     startActivity(intent)

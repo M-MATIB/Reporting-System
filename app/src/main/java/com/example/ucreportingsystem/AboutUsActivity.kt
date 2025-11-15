@@ -6,10 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import com.example.ucreportingsystem.databinding.ActivityAboutUsBinding
 import android.content.Intent
-import com.example.ucreportingsystem.StudentHomeActivity
-import com.example.ucreportingsystem.StudentProfileActivity
-import com.example.ucreportingsystem.LoginActivity
-import com.example.ucreportingsystem.StudentProfileActivity.Companion.EXTRA_LOGIN_PASSWORD
+
 
 class AboutUsActivity : AppCompatActivity() {
 
@@ -67,11 +64,7 @@ class AboutUsActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_profile -> {
-                    val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                        putExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL, emailToPass)
-                        putExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD, passwordToPass)
-                    }
-                    startActivity(intent)
+
                 }
 
                 R.id.nav_about_us -> {

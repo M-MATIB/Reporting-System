@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -13,17 +12,12 @@ import com.example.ucreportingsystem.databinding.ActivityStudentProfileBinding
 import com.google.android.material.button.MaterialButton
 import android.widget.RadioGroup
 import android.widget.RadioButton
-import com.example.ucreportingsystem.StudentHomeActivity
-import com.example.ucreportingsystem.AboutUsActivity
-import com.example.ucreportingsystem.LoginActivity
 
 class StudentProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStudentProfileBinding
 
     companion object {
-        const val EXTRA_LOGIN_EMAIL = "extra_login_email"
-        const val EXTRA_LOGIN_PASSWORD = "extra_login_password"
         const val EXTRA_USER_EMAIL = "extra_user_email"
         private const val DEFAULT_PHONE_TEXT = "Add phone number"
         private const val DEFAULT_ADDRESS_TEXT = "Add address"
@@ -57,19 +51,33 @@ class StudentProfileActivity : AppCompatActivity() {
         binding = ActivityStudentProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val loggedInEmail = intent.getStringExtra(EXTRA_LOGIN_EMAIL) ?: "error@nodata.com"
-        val loggedInPassword = intent.getStringExtra(EXTRA_LOGIN_PASSWORD) ?: "errorpass"
+        // Get the user data directly from the single source of truth: the repository
+        val user = UserRepository.currentUser
 
         currentPhone = DEFAULT_PHONE_TEXT
         currentAddress = DEFAULT_ADDRESS_TEXT
 
-        binding.tvUserEmail?.text = loggedInEmail
-        binding.tvUserPhone?.text = currentPhone
-        binding.tvUserAddress?.text = currentAddress
-        binding.tvDateFormatValue?.text = currentDateFormat
+        if (user != null){
+            binding.tvUserEmail?.text = user?.email
+            binding.tvStudentName?.text = user?.email
+            actualUserPassword = user?.password ?: " "
+            binding.tvUserPhone?.text = currentPhone
+            binding.tvUserAddress?.text = currentAddress
+            binding.tvDateFormatValue?.text = currentDateFormat
+        }
+        else {
+            // This is a safety net. If no user is logged in, redirect to the Login screen.
+            Toast.makeText(this, "Error: User data not found. Please log in again.", Toast.LENGTH_LONG).show()
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish() // Close this activity
+            return // Stop executing the rest of onCreate
+        }
 
 
-        actualUserPassword = loggedInPassword
+
 
         binding.tvUserPassword?.text = "********"
 
@@ -87,7 +95,6 @@ class StudentProfileActivity : AppCompatActivity() {
         binding.btnBackContainer.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-
         binding.ivMenuIcon.setOnClickListener {
             binding.drawerLayout.openDrawer(binding.navView)
         }
@@ -95,8 +102,7 @@ class StudentProfileActivity : AppCompatActivity() {
 
     private fun setupNavigationDrawer() {
         binding.navView.setNavigationItemSelectedListener { menuItem ->
-
-            val email = binding.tvUserEmail?.text.toString()
+            val email = UserRepository.currentUser?.email ?: ""
 
             when (menuItem.itemId) {
                 R.id.nav_home -> {
@@ -105,13 +111,12 @@ class StudentProfileActivity : AppCompatActivity() {
                     }
                     startActivity(intent)
                 }
-                R.id.nav_profile -> {
-                }
                 R.id.nav_about_us -> {
                     val intent = Intent(this, AboutUsActivity::class.java)
                     startActivity(intent)
                 }
                 R.id.nav_logout -> {
+                    UserRepository.clearUser()
                     val intent = Intent(this, LoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }

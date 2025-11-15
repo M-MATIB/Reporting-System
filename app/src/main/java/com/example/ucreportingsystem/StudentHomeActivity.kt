@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -37,8 +38,11 @@ class StudentHomeActivity : AppCompatActivity(), NavigationView.OnNavigationItem
 
         drawerLayout = findViewById(R.id.drawer_layout)
 
-        loggedInEmail = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL) ?: ""
-        loggedInPassword = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD) ?: ""
+        loggedInEmail = UserRepository.currentUser?.email ?: ""
+        //loggedInPassword = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD) ?: ""
+
+        val studentNameTextView = findViewById<TextView>(R.id.tv_student_name)
+        studentNameTextView.text = UserRepository.currentUser?.email ?: "Student"
 
         setupDrawerOpener()
         setupReportButtons()
@@ -139,8 +143,6 @@ class StudentHomeActivity : AppCompatActivity(), NavigationView.OnNavigationItem
 
             R.id.nav_profile -> {
                 val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                    putExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL, loggedInEmail)
-                    putExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD, loggedInPassword)
                 }
                 startActivity(intent)
             }
@@ -159,6 +161,7 @@ class StudentHomeActivity : AppCompatActivity(), NavigationView.OnNavigationItem
 
 
             R.id.nav_logout -> {
+                UserRepository.clearUser()
                 Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
