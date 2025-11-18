@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,18 +27,13 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
     private lateinit var searchEditText: EditText
     private var activeFilterButton: MaterialButton? = null
     private var activeFilterButtonId: Int = R.id.btn_status_all_filter
-    private var loggedInEmail: String = ""
-    private var loggedInPassword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification)
 
         drawerLayout = findViewById(R.id.drawer_layout)
-
-        //loggedInEmail = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_EMAIL)
-            //?: intent.getStringExtra(StudentHomeActivity.EXTRA_USER_EMAIL) ?: ""
-        //loggedInPassword = intent.getStringExtra(StudentProfileActivity.EXTRA_LOGIN_PASSWORD) ?: ""
+        val navView: NavigationView = findViewById(R.id.nav_view)
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_notifications)
         allNotifications = createSampleNotifications()
@@ -46,15 +42,13 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
         recyclerView.adapter = adapter
 
         setupNavigationAndFiltering()
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
 
     }
 
     private fun setupNavigationAndFiltering() {
-
-        findViewById<View>(R.id.iv_menu_icon).setOnClickListener {
-            drawerLayout.openDrawer(GravityCompat.START)
-        }
-
         findViewById<LinearLayout>(R.id.btn_back_container).setOnClickListener {
             finish()
         }
@@ -82,9 +76,20 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
 
         activeFilterButton = allFilterButton
         updateButtonState(activeFilterButton!!)
+    }
 
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        navView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
+    private fun setupDrawerOpener() {
+        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+    }
+
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, drawerLayout, navView)
+    }
+
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
     }
 
     private fun handleStatusFilterClick(selectedButton: MaterialButton, status: NotificationStatus?) {
@@ -211,7 +216,7 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
 
             R.id.nav_about_us -> {
                 intent = Intent(this, AboutUsActivity::class.java).apply {
-                    putExtra(StudentHomeActivity.EXTRA_USER_EMAIL, loggedInEmail)
+                    //putExtra(StudentHomeActivity.EXTRA_USER_EMAIL, loggedInEmail)
                 }
                 startActivity(intent)
             }

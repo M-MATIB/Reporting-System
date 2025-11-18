@@ -5,13 +5,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
 object UserRepository {
-    //To access cloud Firestore
-    val db = Firebase.firestore
-
     // Data class to represent a user. It's good practice to define the data structure.
     data class User(
         val email: String,
-        val FullName: String? = null,
+        val fullName: String? = null,
         val password: String? = null,
     )
 
@@ -32,6 +29,7 @@ object UserRepository {
 
     fun fetchUser(email: String, password: String, onComplete: (userRole: String?) -> Unit) {
         // First, search in the "Student" collection
+        val db = Firebase.firestore
         db.collection("Student")
             .whereEqualTo("Email", email)
             .whereEqualTo("Password", password)
@@ -59,6 +57,7 @@ object UserRepository {
     }
 
     private fun fetchStaff(email: String, password: String, onComplete: (userRole: String?) -> Unit) {
+        val db = Firebase.firestore
         db.collection("Staff")
             .whereEqualTo("Email", email)
             .whereEqualTo("Password", password)

@@ -3,6 +3,7 @@ package com.example.ucreportingsystem
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,13 +13,15 @@ import com.example.ucreportingsystem.databinding.ActivityStudentProfileBinding
 import com.google.android.material.button.MaterialButton
 import android.widget.RadioGroup
 import android.widget.RadioButton
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 class StudentProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStudentProfileBinding
 
     companion object {
-        const val EXTRA_USER_EMAIL = "extra_user_email"
         private const val DEFAULT_PHONE_TEXT = "Add phone number"
         private const val DEFAULT_ADDRESS_TEXT = "Add address"
         private const val DATE_FORMAT_MMDDYYYY = "MM/DD/YYYY"
@@ -47,9 +50,11 @@ class StudentProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_student_profile)
 
         binding = ActivityStudentProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val navView: NavigationView = binding.navView
 
         // Get the user data directly from the single source of truth: the repository
         val user = UserRepository.currentUser
@@ -76,16 +81,15 @@ class StudentProfileActivity : AppCompatActivity() {
             return // Stop executing the rest of onCreate
         }
 
-
-
-
         binding.tvUserPassword?.text = "********"
 
 
         setupUI()
         setupEditListeners()
         setupPreferenceListeners()
-        setupNavigationDrawer()
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
     }
 
     /**
@@ -100,33 +104,20 @@ class StudentProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupNavigationDrawer() {
-        binding.navView.setNavigationItemSelectedListener { menuItem ->
-            val email = UserRepository.currentUser?.email ?: ""
-
-            when (menuItem.itemId) {
-                R.id.nav_home -> {
-                    val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, email)
-                    }
-                    startActivity(intent)
-                }
-                R.id.nav_about_us -> {
-                    val intent = Intent(this, AboutUsActivity::class.java)
-                    startActivity(intent)
-                }
-                R.id.nav_logout -> {
-                    UserRepository.clearUser()
-                    val intent = Intent(this, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
-                }
+    private fun setupDrawerOpener() {
+        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
+            binding.ivMenuIcon.setOnClickListener {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
             }
-
-            binding.drawerLayout.closeDrawers()
-            return@setNavigationItemSelectedListener true
         }
+    }
+
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, binding.drawerLayout, navView)
+    }
+
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
     }
 
     private fun setupPreferenceListeners() {

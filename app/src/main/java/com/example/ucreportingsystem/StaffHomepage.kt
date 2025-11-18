@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 
@@ -25,10 +26,22 @@ class StaffHomepage : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val staffNameTextView = findViewById<TextView>(R.id.tv_staff_name)
+        staffNameTextView.text = UserRepository.currentUser?.email ?: "Staff"
 
         drawerLayout = findViewById(R.id.drawer_layout)
         setupDrawerOpener()
+        HomeButtons()
 
+    }
+
+    private fun setupDrawerOpener() {
+        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+    }
+
+    private fun HomeButtons(){
         val New_Report = findViewById<Button>(R.id. btn_NewReports)
         New_Report.setOnClickListener {
             Toast.makeText(this, "Navigate to New Reports", Toast.LENGTH_SHORT).show()
@@ -55,12 +68,6 @@ class StaffHomepage : AppCompatActivity() {
             Toast.makeText(this, "Navigate to Resolved Reports", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, Admin_ResolvedReports ::class.java)
             startActivity(intent)
-        }
-    }
-
-    private fun setupDrawerOpener() {
-        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
-            drawerLayout.openDrawer(GravityCompat.START)
         }
     }
 

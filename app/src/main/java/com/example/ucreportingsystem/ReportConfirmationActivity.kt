@@ -3,33 +3,25 @@ package com.example.ucreportingsystem
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
+import java.text.SimpleDateFormat
 import java.util.UUID
+import java.util.Date
+import java.util.Locale
 
 
 class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    private var loggedInEmail: String = "error@nodata.com"
-    private var loggedInPassword: String = ""
-
-    companion object {
-        const val EXTRA_USER_EMAIL = "extra_user_email"
-        const val EXTRA_LOGIN_PASSWORD = "extra_login_password"
-    }
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var tvReportId: TextView
@@ -41,14 +33,12 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
     private lateinit var llAttachmentContainer: LinearLayout
     private lateinit var vAttachmentSeparator: View
     private lateinit var tvSubmittedOnDateTime: TextView
+    private lateinit var tvSubmittedBy: TextView
     private var receivedAttachmentUris: ArrayList<Uri> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_report_confirmation)
-
-        loggedInEmail = intent.getStringExtra(EXTRA_USER_EMAIL) ?: "error@nodata.com"
-        loggedInPassword = intent.getStringExtra(EXTRA_LOGIN_PASSWORD) ?: ""
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -64,25 +54,60 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
         llAttachmentContainer = findViewById(R.id.ll_attachment_container)
         vAttachmentSeparator = findViewById(R.id.v_attachment_separator)
         tvSubmittedOnDateTime = findViewById(R.id.tv_submitted_on_datetime)
-
+        tvSubmittedBy = findViewById(R.id.tv_submitted_by)
 
         navView.setNavigationItemSelectedListener(this)
         menuIcon.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        populateReportDetails(intent)
+        populateReportDetailsFromIntent()
 
         btnBackToHomepage.setOnClickListener {
             val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                putExtra(EXTRA_USER_EMAIL, loggedInEmail)
-                putExtra(EXTRA_LOGIN_PASSWORD, loggedInPassword)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             }
             startActivity(intent)
         }
 
         setupOnBackPressed()
+    }
+
+    private fun populateReportDetailsFromIntent() {
+        tvReportId.text = generateUniqueReportId()
+
+        val reportType = intent.getStringExtra("reportType")
+        val title = intent.getStringExtra("title")
+        val description = intent.getStringExtra("description")
+        val location = intent.getStringExtra("location")
+        val office = intent.getStringExtra("office")
+
+        // 1. Access the UserRepository to get the current user's email
+        val currentUserEmail = UserRepository.currentUser?.email
+
+        // 2. Set the text of the tv_submitted_by TextView
+        //    It's good practice to provide a fallback text in case the user is null
+        tvSubmittedBy.text = currentUserEmail ?: "Unknown User"
+
+        tvReportType.text = when (reportType) {
+            "MedicalEmergencyReport" -> "Medical Emergency Report"
+            "IncidentReport" -> "Incident Report"
+            else -> "Report"
+        }
+
+        tvTitleSummary.text = title
+        tvDescriptionContent.text = description
+        tvLocationArea.text = location
+        tvTargetOffice.text = office
+
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("h:mm:ss a", Locale.getDefault())
+        val now = Date()
+        tvSubmittedOnDateTime.text = "${dateFormat.format(now)}\n${timeFormat.format(now)}"
+
+        // Hide attachment section as it's not being passed
+        llAttachmentContainer.visibility = View.GONE
+        vAttachmentSeparator.visibility = View.GONE
     }
 
     private fun setupOnBackPressed() {
@@ -95,187 +120,18 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
         }
     }
 
-    private fun populateReportDetails(intent: Intent) {
-        tvReportId.text = generateUniqueReportId()
-
-        val reportType = intent.getStringExtra("EXTRA_REPORT_TYPE") ?: "Incident Report"
-        tvReportType.text = reportType
-
-        val reportTitle = intent.getStringExtra("EXTRA_TITLE")
-        val reportDescription = intent.getStringExtra("EXTRA_DESCRIPTION")
-        val reportLocation = intent.getStringExtra("EXTRA_LOCATION")
-        val targetOffice = intent.getStringExtra("EXTRA_OFFICE")
-        val submissionDate = intent.getStringExtra("EXTRA_SUBMISSION_DATE")
-        val submissionTime = intent.getStringExtra("EXTRA_SUBMISSION_TIME")
-
-        @Suppress("DEPRECATION")
-        receivedAttachmentUris = intent.getParcelableArrayListExtra("EXTRA_ATTACHMENT_URIS") ?: ArrayList()
-
-        tvTitleSummary.text = reportTitle
-        tvDescriptionContent.text = reportDescription
-        tvLocationArea.text = reportLocation
-        tvTargetOffice.text = targetOffice
-
-        if (!submissionDate.isNullOrEmpty() && !submissionTime.isNullOrEmpty()) {
-            tvSubmittedOnDateTime.text = "$submissionDate\n$submissionTime"
-        } else {
-            tvSubmittedOnDateTime.text = "Error\nRetrieving Time"
-        }
-
-        if (receivedAttachmentUris.isEmpty()) {
-            llAttachmentContainer.visibility = View.GONE
-            vAttachmentSeparator.visibility = View.GONE
-        } else {
-            llAttachmentContainer.visibility = View.VISIBLE
-            vAttachmentSeparator.visibility = View.VISIBLE
-            llAttachmentContainer.removeAllViews()
-
-            receivedAttachmentUris.forEach { uri ->
-                val fileName = getFileName(uri) ?: "Unknown File"
-                val attachmentView = createAttachmentView(fileName, uri)
-                llAttachmentContainer.addView(attachmentView)
-            }
-        }
-    }
-
-    private fun createAttachmentView(fileName: String, uri: Uri): LinearLayout {
-        val context = this
-        val marginPx = (15 * resources.displayMetrics.density).toInt()
-
-        val container = LinearLayout(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { bottomMargin = marginPx }
-            orientation = LinearLayout.VERTICAL
-            gravity = android.view.Gravity.CENTER
-
-            background = ContextCompat.getDrawable(context, R.drawable.rounded_yellow)
-            setPadding(15, 15, 15, 15)
-
-            setOnClickListener { viewAttachment(uri) }
-        }
-
-        val icon = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                (35 * resources.displayMetrics.density).toInt(),
-                (35 * resources.displayMetrics.density).toInt()
-            )
-            setImageResource(R.drawable.file_image_icon)
-            contentDescription = "Attachment Preview"
-            setColorFilter(ContextCompat.getColor(context, R.color.black))
-        }
-        container.addView(icon)
-
-        val previewTextView = TextView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            text = "Attachment Preview"
-            setTextColor(ContextCompat.getColor(context, R.color.black))
-            textSize = 16f
-            setPadding(0, 10, 0, 0)
-        }
-        container.addView(previewTextView)
-
-        val nameTextView = TextView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            text = fileName
-            setTextColor(ContextCompat.getColor(context, R.color.black))
-            textSize = 12f
-        }
-        container.addView(nameTextView)
-
-        return container
-    }
-
-    /**
-     * Robust file viewing logic with a fallback to a generic MIME type.
-     */
-
-    private fun viewAttachment(uri: Uri) {
-        if (uri.scheme == "placeholder") {
-            Toast.makeText(this, "Cannot open placeholder image: ${getFileName(uri)}", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        try {
-            val intent = Intent(Intent.ACTION_VIEW)
-
-            val specificMimeType = contentResolver.getType(uri) ?: "*/*"
-
-            intent.setDataAndType(uri, specificMimeType)
-
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-
-                intent.setDataAndType(uri, "*/*")
-                if (intent.resolveActivity(packageManager) != null) {
-                    startActivity(intent)
-                } else {
-
-                    Toast.makeText(this, "No application found to view files.", Toast.LENGTH_LONG).show()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("ViewAttachment", "Error opening file: ${e.message}", e)
-            Toast.makeText(this, "Error opening file: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
-
     private fun generateUniqueReportId(): String {
         val uuid = UUID.randomUUID().toString()
         val shortId = uuid.substring(0, 8).uppercase()
         return "RPT-$shortId"
     }
 
-    private fun getFileName(uri: Uri): String? {
-        if (uri.scheme == "placeholder") {
-            return uri.pathSegments.lastOrNull()
-        }
-
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor = contentResolver.query(uri, null, null, null, null)
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (nameIndex != -1) {
-                        result = it.getString(nameIndex)
-                    }
-                }
-            }
-        }
-
-        if (result == null) {
-            result = uri.path
-            val cut = result?.lastIndexOf('/')
-            if (cut != -1 && cut != null) {
-                result = result?.substring(cut + 1)
-            }
-        }
-        return result
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         drawerLayout.closeDrawer(GravityCompat.START)
-
-        val emailToPass = loggedInEmail
-        val passwordToPass = loggedInPassword
 
         when (item.itemId) {
             R.id.nav_home -> {
                 val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                    putExtra(EXTRA_USER_EMAIL, emailToPass)
-                    putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 startActivity(intent)
@@ -283,16 +139,12 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
             }
             R.id.nav_profile -> {
                 val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                    //putExtra(EXTRA_LOGIN_EMAIL, emailToPass)
-                    putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
                 }
                 startActivity(intent)
                 return true
             }
             R.id.nav_about_us -> {
                 val intent = Intent(this, AboutUsActivity::class.java).apply {
-                    putExtra(EXTRA_USER_EMAIL, emailToPass)
-                    putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
                 }
                 startActivity(intent)
                 return true
@@ -307,4 +159,7 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
 
         return false
     }
+
+
+
 }

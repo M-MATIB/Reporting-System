@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.TypedValue
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,26 +16,27 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 
 class MedicalEmergencyActivity : AppCompatActivity() {
 
-    private var loggedInEmail: String = "error@nodata.com"
-    private var loggedInPassword: String = ""
-    companion object {
-        const val EXTRA_USER_EMAIL = "extra_user_email"
-        const val EXTRA_LOGIN_PASSWORD = "extra_login_password"
-    }
+    //View Declaration
+    private lateinit var Title: EditText
+    private lateinit var ReportDescription: EditText
+    private lateinit var SubmitReportButton: Button
+    private var SelectedUserLocation: String? = null
+    private var SelectedReportDestination: String? = null
+
+    //To access cloud Firestore
+    val db = Firebase.firestore
 
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var etReportTitle: EditText
-    private lateinit var etReportDescription: EditText
     private lateinit var tvOfficePlaceholder: TextView
     private lateinit var tvLocationPlaceholder: TextView
     private lateinit var llAttachmentsList: LinearLayout
@@ -42,40 +44,57 @@ class MedicalEmergencyActivity : AppCompatActivity() {
     private var attachedFiles: MutableList<Uri> = mutableListOf()
     private lateinit var capturePhotoLauncher: ActivityResultLauncher<Intent>
     private lateinit var uploadFileLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private var currentPhotoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_medical_emergency)
 
-        loggedInEmail = intent.getStringExtra(EXTRA_USER_EMAIL) ?: "error@nodata.com"
-        loggedInPassword = intent.getStringExtra(EXTRA_LOGIN_PASSWORD) ?: ""
-
         drawerLayout = findViewById(R.id.drawer_layout)
-        tvLocationPlaceholder = findViewById(R.id.tv_location_placeholder)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+
+        //View Initialization
+        Title = findViewById(R.id.et_report_title)
+        ReportDescription = findViewById(R.id.et_report_description)
+        SubmitReportButton = findViewById(R.id.btn_submit_report)
         llAttachmentsList = findViewById(R.id.ll_attachments_list)
         llUploadButtonsContainer = findViewById(R.id.ll_upload_buttons_container)
-
-        etReportTitle = findViewById(R.id.et_report_title)
-        etReportDescription = findViewById(R.id.et_report_description)
+        tvLocationPlaceholder = findViewById(R.id.tv_location_placeholder)
         tvOfficePlaceholder = findViewById(R.id.tv_office_placeholder)
 
         setupActivityResults()
-        setupTopBarAndNavigation()
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
         setupFormInteractions()
         refreshAttachmentsList()
+        handleSubmitReport()
     }
 
     private fun setupActivityResults() {
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                launchCameraIntent()
+            } else {
+                Toast.makeText(this, "Camera permission denied. Cannot capture photo.", Toast.LENGTH_LONG).show()
+            }
+        }
+
         capturePhotoLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK) {
-                val dummyName = "Captured Photo ${attachedFiles.size + 1}.jpg"
-                attachedFiles.add(Uri.parse("placeholder:///$dummyName"))
-                refreshAttachmentsList()
-                Toast.makeText(this, "Photo Captured Successfully! Total: ${attachedFiles.size}", Toast.LENGTH_SHORT).show()
+                currentPhotoUri?.let { uri ->
+                    attachedFiles.add(uri)
+                    refreshAttachmentsList()
+                    Toast.makeText(this, "Photo Captured Successfully! Total: ${attachedFiles.size}", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(this, "Photo capture cancelled.", Toast.LENGTH_SHORT).show()
+                currentPhotoUri = null
             }
         }
 
@@ -92,57 +111,18 @@ class MedicalEmergencyActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupTopBarAndNavigation() {
+    private fun setupDrawerOpener() {
         findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
-            drawerLayout.openDrawer(findViewById<NavigationView>(R.id.nav_view))
+            drawerLayout.openDrawer(GravityCompat.START)
         }
+    }
 
-        findViewById<LinearLayout>(R.id.btn_back_container)?.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, drawerLayout, navView)
+    }
 
-        val navView: NavigationView = findViewById(R.id.nav_view)
-        val emailToPass = loggedInEmail
-        val passwordToPass = loggedInPassword
-
-        navView.setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawers()
-
-            when (menuItem.itemId) {
-                R.id.nav_home -> {
-                    val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, emailToPass)
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-                R.id.nav_profile -> {
-                    val intent = Intent(this, StudentProfileActivity::class.java).apply {
-
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-                R.id.nav_about_us -> {
-                    val intent = Intent(this, AboutUsActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, emailToPass)
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-                R.id.nav_logout -> {
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-            }
-            true
-        }
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
     }
 
     private fun setupFormInteractions() {
@@ -162,50 +142,67 @@ class MedicalEmergencyActivity : AppCompatActivity() {
             launchFilePickerIntent()
         }
 
-        findViewById<MaterialButton>(R.id.btn_submit_report)?.setOnClickListener {
-            handleSubmitReport()
-        }
     }
 
     private fun handleSubmitReport() {
-        val reportTitle = etReportTitle.text?.toString()?.trim() ?: ""
-        val reportDescription = etReportDescription.text?.toString()?.trim() ?: ""
-        val reportLocation = tvLocationPlaceholder.text.toString()
-        val targetOffice = tvOfficePlaceholder.text.toString()
+        SubmitReportButton.setOnClickListener {
+            val reportTitle = Title.text.toString().trim()
+            val reportDescription = ReportDescription.text.toString().trim()
+            val selectedUserLocation = SelectedUserLocation
+            val selectedReportDestination = SelectedReportDestination
 
-        val defaultLocationText = "Room #"
-        val defaultOfficeText = "Select Office/Department"
+            if (reportTitle.isEmpty() || reportDescription.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Please complete all required fields (Title and Description).",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (selectedUserLocation.isNullOrEmpty() || selectedReportDestination.isNullOrEmpty()) {
+                Toast.makeText(this, "Please select a location and office.", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                // This function adds the data to Firestore. Good.
+                AddMedicalEmergencyReportToFirestore(
+                    reportTitle,
+                    reportDescription,
+                    selectedUserLocation,
+                    selectedReportDestination
+                )
+                Toast.makeText(this, "Report submitted successfully!", Toast.LENGTH_SHORT).show()
 
-        if (reportTitle.isBlank() || reportDescription.isBlank() || reportLocation == defaultLocationText || targetOffice == defaultOfficeText) {
-            Toast.makeText(this, "Please complete all required fields (Title, Description, Location, and Office).", Toast.LENGTH_LONG).show()
-            return
+                val intent = Intent(this, ReportConfirmationActivity::class.java).apply {
+                    putExtra("reportType", "MedicalEmergencyReport")
+                    putExtra("title", reportTitle)
+                    putExtra("description", reportDescription)
+                    putExtra("location", selectedUserLocation)
+                    putExtra("office", selectedReportDestination)
+                }
+                startActivity(intent)
+            }
         }
+    }
 
-        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("h:mm:ss a", Locale.getDefault())
-        val submissionDate = dateFormat.format(Date())
-        val submissionTime = timeFormat.format(Date())
-
-        val intent = Intent(this, ReportConfirmationActivity::class.java)
-
-        intent.putExtra("EXTRA_REPORT_TYPE", "Medical Emergency")
-        intent.putExtra("EXTRA_TITLE", reportTitle)
-        intent.putExtra("EXTRA_DESCRIPTION", reportDescription)
-        intent.putExtra("EXTRA_LOCATION", reportLocation)
-        intent.putExtra("EXTRA_OFFICE", targetOffice)
-        intent.putExtra("EXTRA_SUBMISSION_DATE", submissionDate)
-        intent.putExtra("EXTRA_SUBMISSION_TIME", submissionTime)
-        intent.putExtra(ReportConfirmationActivity.EXTRA_USER_EMAIL, loggedInEmail)
-        intent.putExtra(ReportConfirmationActivity.EXTRA_LOGIN_PASSWORD, loggedInPassword)
-        intent.putParcelableArrayListExtra("EXTRA_ATTACHMENT_URIS", ArrayList(attachedFiles))
-
-        startActivity(intent)
+    private fun AddMedicalEmergencyReportToFirestore(
+        Title: String,
+        IssueDescription: String,
+        UserLocation: String,
+        ReportDestination: String
+    ){
+        val MedicalEmergencyReportContents = hashMapOf(
+            "Title" to Title,
+            "IssueDescription" to IssueDescription,
+            "UserLocation" to UserLocation,
+            "ReportDestination" to ReportDestination
+        )
+        db.collection("MedicalEmergencyReports")
+            .add(MedicalEmergencyReportContents)
     }
 
     private fun showLocationSelectionDialog() {
         val rooms = listOf("M301", "M302", "M303", "M304", "M305", "M306", "M307")
 
         val dialog = RoomSelectionDialogFragment(rooms) { selectedItem ->
+            SelectedUserLocation = selectedItem
             tvLocationPlaceholder.text = selectedItem
             tvLocationPlaceholder.setTextColor(ContextCompat.getColor(this, R.color.black))
             Toast.makeText(this, "Selected Location: $selectedItem", Toast.LENGTH_SHORT).show()
@@ -217,6 +214,7 @@ class MedicalEmergencyActivity : AppCompatActivity() {
         val offices = listOf("CITCS", "COA", "CON", "CEA", "CTE", "CAS", "CHTM", "COL", "CBA")
 
         val dialog = RoomSelectionDialogFragment(offices) { selectedItem ->
+            SelectedReportDestination = selectedItem
             tvOfficePlaceholder.text = selectedItem
             tvOfficePlaceholder.setTextColor(ContextCompat.getColor(this, R.color.black))
             Toast.makeText(this, "Selected Office: $selectedItem", Toast.LENGTH_SHORT).show()
@@ -348,3 +346,4 @@ class MedicalEmergencyActivity : AppCompatActivity() {
         return result
     }
 }
+

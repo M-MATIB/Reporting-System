@@ -16,7 +16,7 @@
     <string name="complete_registration">Complete Registration</string>
     <string name="go_to_login"><u>Go to Login</u></string>
     <string name="staff_registration">Staff Registration</string>
-    <string name="success_message">Thank you <b>Jose Rizal</b>, for submitting this critical information.</string>
+    <string name="success_message">Thank you for submitting this critical information.</string>
     <string name="label_report_id">Report ID</string>
     <string name="label_type">Type:</string>
     <string name="label_location">Location:</string>

@@ -5,82 +5,47 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import com.example.ucreportingsystem.databinding.ActivityAboutUsBinding
-import android.content.Intent
+import android.widget.ImageView
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 
 class AboutUsActivity : AppCompatActivity() {
-
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var binding: ActivityAboutUsBinding
-    private var loggedInEmail: String = "error@nodata.com"
-    private var loggedInPassword: String = ""
-
-    companion object {
-        const val EXTRA_USER_EMAIL = "extra_user_email"
-        const val EXTRA_LOGIN_PASSWORD = "extra_login_password"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_about_us)
+
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
 
         binding = ActivityAboutUsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        loggedInEmail = intent.getStringExtra(EXTRA_USER_EMAIL) ?: "error@nodata.com"
-        loggedInPassword = intent.getStringExtra(EXTRA_LOGIN_PASSWORD) ?: ""
-
-        setupDrawerAndHeader()
         setupPvmToggleGroup()
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
 
         updateToggleStyles(binding.btnPurpose.id)
         displayContent(binding.btnPurpose.id)
     }
 
-    private fun setupDrawerAndHeader() {
-        binding.ivMenuIcon.setOnClickListener {
-            binding.drawerLayout.openDrawer(GravityCompat.START)
+    private fun setupDrawerOpener() {
+        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
         }
-
-        binding.btnBackContainer.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        setupNavigationDrawer()
     }
 
-    private fun setupNavigationDrawer() {
-        binding.navView.setNavigationItemSelectedListener { menuItem ->
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, drawerLayout, navView)
+    }
 
-            val emailToPass = loggedInEmail
-            val passwordToPass = loggedInPassword
-
-            when (menuItem.itemId) {
-
-                R.id.nav_home -> {
-                    val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, emailToPass)
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                    }
-                    startActivity(intent)
-                }
-
-                R.id.nav_profile -> {
-
-                }
-
-                R.id.nav_about_us -> {
-                }
-
-                R.id.nav_logout -> {
-                    val intent = Intent(this, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
-                }
-            }
-
-            binding.drawerLayout.closeDrawers()
-            return@setNavigationItemSelectedListener true
-        }
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
     }
 
     private fun setupPvmToggleGroup() {

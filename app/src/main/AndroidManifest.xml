@@ -51,12 +51,6 @@
             android:name=".StaffHomepage"
             android:exported="false" />
         <activity
-            android:name=".ChangePass"
-            android:exported="false" />
-        <activity
-            android:name=".Settings"
-            android:exported="false" />
-        <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"

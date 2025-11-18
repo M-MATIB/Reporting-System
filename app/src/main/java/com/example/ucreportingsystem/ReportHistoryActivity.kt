@@ -4,17 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.GravityCompat
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.ucreportingsystem.databinding.ActivityReportHistoryBinding
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.button.MaterialButton
 
 class ReportHistoryActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityReportHistoryBinding
     private lateinit var reportAdapter: ReportAdapter
     private val allReports = mutableListOf<Report>()
@@ -27,13 +28,19 @@ class ReportHistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_report_history)
+
         binding = ActivityReportHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val navView: NavigationView = binding.navView
 
         binding.ivMenuIcon.setOnClickListener {
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
-        setupDrawerNavigation()
+
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
 
         binding.btnBackContainer.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -47,27 +54,20 @@ class ReportHistoryActivity : AppCompatActivity() {
         updateButtonState(binding.btnStatusAll as MaterialButton)
     }
 
-    private fun setupDrawerNavigation() {
-        val navView: NavigationView = binding.navView
-        navView.setNavigationItemSelectedListener { menuItem ->
-            binding.drawerLayout.closeDrawers()
-            when (menuItem.itemId) {
-                R.id.nav_home -> startActivity(Intent(this, StudentHomeActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                })
-                R.id.nav_logout -> {
-                    Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, LoginActivity::class.java).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    })
-                    finish()
-                }
-                R.id.nav_profile -> Toast.makeText(this, "Navigating to Profile...", Toast.LENGTH_SHORT).show()
-                R.id.nav_about_us -> Toast.makeText(this, "Navigating to About Us...", Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(this, "Navigating to: ${menuItem.title}", Toast.LENGTH_SHORT).show()
+    private fun setupDrawerOpener() {
+        findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
+            binding.ivMenuIcon.setOnClickListener {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
             }
-            true
         }
+    }
+
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, binding.drawerLayout, navView)
+    }
+
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
     }
 
     private fun setupRecyclerView() {

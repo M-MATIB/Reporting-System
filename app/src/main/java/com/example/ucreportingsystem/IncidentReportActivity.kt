@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.TypedValue
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -17,30 +18,30 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.core.content.FileProvider
 import java.io.File
-
-
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 class IncidentReportActivity : AppCompatActivity() {
+    //View Declaration
+    private lateinit var Title: EditText
+    private lateinit var ReportDescription: EditText
+    private lateinit var SubmitReportButton: Button
+    private var SelectedUserLocation: String? = null
+    private var SelectedReportDestination: String? = null
 
-    companion object {
-        const val EXTRA_USER_EMAIL = "extra_user_email"
-        const val EXTRA_LOGIN_PASSWORD = "extra_login_password"
-    }
-
-    private var loggedInEmail: String = "error@nodata.com"
-    private var loggedInPassword: String = ""
+    //To access cloud Firestore
+    val db = Firebase.firestore
 
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var etReportTitle: EditText
-    private lateinit var etReportDescription: EditText
     private lateinit var tvOfficePlaceholder: TextView
     private lateinit var tvLocationPlaceholder: TextView
     private lateinit var llAttachmentsList: LinearLayout
@@ -55,23 +56,30 @@ class IncidentReportActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_incident_report)
-        loggedInEmail = intent.getStringExtra(EXTRA_USER_EMAIL) ?: "error@nodata.com"
-        loggedInPassword = intent.getStringExtra(EXTRA_LOGIN_PASSWORD) ?: ""
 
-
+        //To copy start
         drawerLayout = findViewById(R.id.drawer_layout)
-        tvLocationPlaceholder = findViewById(R.id.tv_location_placeholder)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+        //To copy end
+
+        //View Initialization
+        Title = findViewById(R.id.et_report_title)
+        ReportDescription = findViewById(R.id.et_report_description)
+        SubmitReportButton = findViewById(R.id.btn_submit_report)
         llAttachmentsList = findViewById(R.id.ll_attachments_list)
         llUploadButtonsContainer = findViewById(R.id.ll_upload_buttons_container)
-
-        etReportTitle = findViewById(R.id.et_report_title)
-        etReportDescription = findViewById(R.id.et_report_description)
         tvOfficePlaceholder = findViewById(R.id.tv_office_placeholder)
+        tvLocationPlaceholder = findViewById(R.id.tv_location_placeholder)
 
         setupActivityResults()
-        setupTopBarAndNavigation()
+        //To copy start
+        setupDrawerOpener()
+        setupDrawerNavigationHeader(navView)
+        setupDrawerNavigation(navView)
+        //To copy end
         setupFormInteractions()
         refreshAttachmentsList()
+        handleSubmitReport()
     }
 
     private fun setupActivityResults() {
@@ -113,67 +121,21 @@ class IncidentReportActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupTopBarAndNavigation() {
+    //To copy start
+    private fun setupDrawerOpener() {
         findViewById<ImageView>(R.id.iv_menu_icon).setOnClickListener {
-            drawerLayout.openDrawer(findViewById<NavigationView>(R.id.nav_view))
-        }
-
-        findViewById<LinearLayout>(R.id.btn_back_container)?.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        val navView: NavigationView = findViewById(R.id.nav_view)
-
-        val emailToPass = loggedInEmail
-        val passwordToPass = loggedInPassword
-
-        navView.setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawers()
-
-            when (menuItem.itemId) {
-                R.id.nav_home -> {
-                    val intent = Intent(this, StudentHomeActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, emailToPass)
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-
-                R.id.nav_profile -> {
-                    val intent = Intent(this, StudentProfileActivity::class.java).apply {
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-
-                R.id.nav_about_us -> {
-                    val intent = Intent(this, AboutUsActivity::class.java).apply {
-                        putExtra(EXTRA_USER_EMAIL, emailToPass)
-                        putExtra(EXTRA_LOGIN_PASSWORD, passwordToPass)
-                    }
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-
-                R.id.nav_settings -> {
-                    val intent = Intent(this, Settings::class.java)
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-
-                R.id.nav_logout -> {
-                    val intent = Intent(this, LoginActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                    return@setNavigationItemSelectedListener true
-                }
-            }
-
-            true
+            drawerLayout.openDrawer(GravityCompat.START)
         }
     }
+
+    private fun setupDrawerNavigation(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.setupNavigationDrawer(this, drawerLayout, navView)
+    }
+
+    private fun setupDrawerNavigationHeader(navView: NavigationView) {
+        HamburgerNavigationDrawerManager.NavigationHeader(navView)
+    }
+    //To copy end
 
     private fun setupFormInteractions() {
         findViewById<LinearLayout>(R.id.btn_select_location)?.setOnClickListener {
@@ -192,9 +154,6 @@ class IncidentReportActivity : AppCompatActivity() {
             launchFilePickerIntent()
         }
 
-        findViewById<MaterialButton>(R.id.btn_submit_report)?.setOnClickListener {
-            handleSubmitReport()
-        }
     }
 
     private fun checkCameraPermission() {
@@ -205,44 +164,65 @@ class IncidentReportActivity : AppCompatActivity() {
         }
     }
 
-
     private fun handleSubmitReport() {
-        val reportTitle = etReportTitle.text?.toString()?.trim() ?: ""
-        val reportDescription = etReportDescription.text?.toString()?.trim() ?: ""
-        val reportLocation = tvLocationPlaceholder.text.toString()
-        val targetOffice = tvOfficePlaceholder.text.toString()
-        val defaultLocationText = "Room #"
-        val defaultOfficeText = "Select Office/Department"
+        SubmitReportButton.setOnClickListener {
+            val reportTitle = Title.text.toString().trim()
+            val reportDescription = ReportDescription.text.toString().trim()
+            val selectedUserLocation = SelectedUserLocation
+            val selectedReportDestination = SelectedReportDestination
 
-        if (reportTitle.isBlank() || reportDescription.isBlank() || reportLocation == defaultLocationText || targetOffice == defaultOfficeText) {
-            Toast.makeText(this, "Please complete all required fields (Title, Description, Location, and Office).", Toast.LENGTH_LONG).show()
-            return
+            if (reportTitle.isEmpty() || reportDescription.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Please complete all required fields (Title and Description).",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (selectedUserLocation.isNullOrEmpty() || selectedReportDestination.isNullOrEmpty()) {
+                Toast.makeText(this, "Please select a location and office.", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                AddIncidentReportToFirestore(
+                    reportTitle,
+                    reportDescription,
+                    selectedUserLocation,
+                    selectedReportDestination
+                )
+                Toast.makeText(this, "Report submitted successfully!", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, ReportConfirmationActivity::class.java).apply {
+                    putExtra("reportType", "IncidentReport")
+                    putExtra("title", reportTitle)
+                    putExtra("description", reportDescription)
+                    putExtra("location", selectedUserLocation)
+                    putExtra("office", selectedReportDestination)
+                }
+                startActivity(intent)
+            }
         }
+    }
 
-        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("h:mm:ss a", Locale.getDefault())
-        val submissionDate = dateFormat.format(Date())
-        val submissionTime = timeFormat.format(Date())
-        val intent = Intent(this, ReportConfirmationActivity::class.java)
-
-        intent.putExtra("EXTRA_REPORT_TYPE", "Incident Report")
-        intent.putExtra("EXTRA_TITLE", reportTitle)
-        intent.putExtra("EXTRA_DESCRIPTION", reportDescription)
-        intent.putExtra("EXTRA_LOCATION", reportLocation)
-        intent.putExtra("EXTRA_OFFICE", targetOffice)
-        intent.putExtra("EXTRA_SUBMISSION_DATE", submissionDate)
-        intent.putExtra("EXTRA_SUBMISSION_TIME", submissionTime)
-        intent.putParcelableArrayListExtra("EXTRA_ATTACHMENT_URIS", ArrayList(attachedFiles))
-
-        startActivity(intent)
+    private fun AddIncidentReportToFirestore(
+        Title: String,
+        IssueDescription: String,
+        UserLocation: String,
+        ReportDestination: String
+    ){
+        val IncidentReportContents = hashMapOf(
+            "Title" to Title,
+            "IssueDescription" to IssueDescription,
+            "UserLocation" to UserLocation,
+            "ReportDestination" to ReportDestination
+        )
+        db.collection("IncidentReports")
+            .add(IncidentReportContents)
     }
 
     private fun showLocationSelectionDialog() {
         val rooms = listOf("M301", "M302", "M303", "M304", "M305", "M306", "M307")
         val dialog = RoomSelectionDialogFragment(rooms) { selectedItem ->
+            SelectedUserLocation = selectedItem
             tvLocationPlaceholder.text = selectedItem
             tvLocationPlaceholder.setTextColor(ContextCompat.getColor(this, R.color.black))
-            Toast.makeText(this, "Selected Location: $selectedItem", Toast.LENGTH_SHORT).show()
         }
         dialog.show(supportFragmentManager, "LOCATION_SELECTOR_TAG")
     }
@@ -250,18 +230,13 @@ class IncidentReportActivity : AppCompatActivity() {
     private fun showOfficeSelectionDialog() {
         val offices = listOf("CITCS", "COA", "CON", "CEA", "CTE", "CAS", "CHTM", "COL", "CBA")
         val dialog = RoomSelectionDialogFragment(offices) { selectedItem ->
+            SelectedReportDestination = selectedItem
             tvOfficePlaceholder.text = selectedItem
             tvOfficePlaceholder.setTextColor(ContextCompat.getColor(this, R.color.black))
-            Toast.makeText(this, "Selected Office: $selectedItem", Toast.LENGTH_SHORT).show()
         }
         dialog.show(supportFragmentManager, "OFFICE_SELECTOR_TAG")
     }
-
-    /**
-     * MODIFIED FUNCTION: Now creates a file URI using FileProvider and passes it to the camera app
-     * via MediaStore.EXTRA_OUTPUT, which is required for the camera to save the file and for
-     * the attachment to be valid.
-     */
+    
     private fun launchCameraIntent() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             Toast.makeText(this, "This device/emulator has no camera hardware feature.", Toast.LENGTH_LONG).show()
@@ -321,9 +296,6 @@ class IncidentReportActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Creates a unique image file in the app's private external storage directory.
-     */
     @Throws(Exception::class)
     private fun createImageFile(): File {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -423,12 +395,7 @@ class IncidentReportActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * MODIFIED FUNCTION: Removes the deprecated placeholder logic and includes
-     * the 'file' scheme check which is necessary for FileProvider URIs.
-     */
     private fun getFileName(uri: Uri): String? {
-
         var result: String? = null
         if (uri.scheme == "content" || uri.scheme == "file") {
             val cursor = contentResolver.query(uri, null, null, null, null)

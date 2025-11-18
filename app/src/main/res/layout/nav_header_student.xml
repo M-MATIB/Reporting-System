@@ -10,7 +10,6 @@
     android:paddingTop="32dp"
     android:paddingEnd="16dp"
     android:paddingBottom="16dp"
-
     android:gravity="center_horizontal">
 
     <ImageView

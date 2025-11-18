@@ -1,9 +1,7 @@
 package com.example.ucreportingsystem
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -12,17 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.example.ucreportingsystem.R
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-
-
-data class Staff(
-    val uid: String,
-    val name: String,
-    val email: String?,
-    val office: String,
-    val role: String = "Staff")
 
 class StaffRegistrationActivity : AppCompatActivity() {
 
@@ -62,9 +51,7 @@ class StaffRegistrationActivity : AppCompatActivity() {
         val offices = resources.getStringArray(R.array.office_departments_array)
         val selectionTextView = findViewById<TextView>(R.id.tv_office_selection_text)
         val dropdownBox = findViewById<ConstraintLayout>(R.id.cl_dropdown_box)
-
         dropdownBox.setOnClickListener {
-
             MaterialAlertDialogBuilder(
                 this,
                 com.google.android.material.R.style.Theme_MaterialComponents_Light_Dialog_Alert
@@ -154,12 +141,6 @@ class StaffRegistrationActivity : AppCompatActivity() {
         )
         db.collection("Staff")
             .add(staff)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
-            }
     }
 
 }
