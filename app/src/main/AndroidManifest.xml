@@ -35,6 +35,23 @@
         android:roundIcon="@mipmap/ic_launcher_ucrs_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UCRS">
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.UCRS">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".LoginStaffActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UCRS" />
+
         <activity
             android:name=".Admin_ResolvedReports"
             android:exported="false" />
@@ -50,16 +67,6 @@
         <activity
             android:name=".StaffHomepage"
             android:exported="false" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.UCRS">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".StudentRegistrationActivity"
             android:exported="false"

@@ -10,55 +10,46 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
-class LoginActivity : AppCompatActivity() {
+class LoginStaffActivity : AppCompatActivity() {
 
     private lateinit var EmailInput: EditText
     private lateinit var PasswordInput: EditText
     private lateinit var toggleGroup: MaterialButtonToggleGroup
 
-    // To access cloud Firestore
     val db = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_login_staff)
 
-        // Initialize Views
         EmailInput = findViewById(R.id.et_email)
         PasswordInput = findViewById(R.id.et_password)
         toggleGroup = findViewById(R.id.toggle_role_group)
 
-        // Initialize Setup Functions
         setupToggleLogic()
         setupCreateAccountLink()
         setupLoginButton()
         setupEmergencyReportButton()
     }
 
-    // 1. NEW: Logic to switch to Staff Activity
     private fun setupToggleLogic() {
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked && checkedId == R.id.btn_role_staff) {
-                // User clicked Staff -> Switch to LoginStaffActivity
-                val intent = Intent(this, LoginStaffActivity::class.java)
+            if (isChecked && checkedId == R.id.btn_role_student) {
+                val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
-
-                // Remove animation so it looks like a toggle inside the same screen
                 overridePendingTransition(0, 0)
                 finish()
             }
         }
     }
 
-    // 2. Create Account -> Goes to STUDENT Registration
     private fun setupCreateAccountLink() {
         findViewById<Button>(R.id.btn_create_account).setOnClickListener {
-            val intent = Intent(this, StudentRegistrationActivity::class.java)
+            val intent = Intent(this, StaffRegistrationActivity::class.java)
             startActivity(intent)
         }
     }
 
-    // 3. Login Logic
     private fun setupLoginButton() {
         findViewById<Button>(R.id.btn_login).setOnClickListener {
 
