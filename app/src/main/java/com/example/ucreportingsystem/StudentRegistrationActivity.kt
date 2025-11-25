@@ -8,7 +8,6 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButtonToggleGroup
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -31,33 +30,12 @@ class StudentRegistrationActivity : AppCompatActivity() {
 
         //View Initialization
         StudentName = findViewById(R.id.et_full_name)
-        SchoolEmail = findViewById(R.id.et_school_email)
+        SchoolEmail = findViewById(R.id.et_school_id)
         CreatePassword = findViewById(R.id.et_create_password)
         ConfirmPassword = findViewById(R.id.et_confirm_password)
         Register = findViewById(R.id.btn_register)
 
-        setupRoleToggle()
         setupFinalButtons()
-    }
-
-    private fun setupRoleToggle() {
-        val toggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.toggle_role_group)
-
-        toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                when (checkedId) {
-                    R.id.btn_role_staff -> {
-                        val intent = Intent(this, StaffRegistrationActivity::class.java)
-
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        startActivity(intent)
-                        finish()
-                    }
-                    R.id.btn_role_student -> {
-                    }
-                }
-            }
-        }
     }
 
     private fun setupFinalButtons() {
@@ -66,14 +44,13 @@ class StudentRegistrationActivity : AppCompatActivity() {
             RegisterStudents()
         }
 
-        findViewById<Button>(R.id.btn_create_account).setOnClickListener {
+        findViewById<Button>(R.id.btn_toLogin).setOnClickListener {
             navigateToLogin()
         }
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-
+        val intent = Intent(this, LoginStudent::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }

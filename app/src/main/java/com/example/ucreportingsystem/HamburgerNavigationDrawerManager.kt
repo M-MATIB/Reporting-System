@@ -44,8 +44,8 @@ object HamburgerNavigationDrawerManager {
                         UserRepository.clearUser()
                         Toast.makeText(activity, "Logging out...", Toast.LENGTH_LONG).show()
 
-                        // Navigate to LoginActivity and clear the back stack
-                        val intent = Intent(activity, LoginActivity::class.java).apply {
+                        // Navigate to LoginStudent and clear the back stack
+                        val intent = Intent(activity, LoginStudent::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }
                         activity.startActivity(intent)

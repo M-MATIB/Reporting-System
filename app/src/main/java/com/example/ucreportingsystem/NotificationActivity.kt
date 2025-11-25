@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -223,7 +222,7 @@ class NotificationActivity : AppCompatActivity(), NavigationView.OnNavigationIte
 
             R.id.nav_logout -> {
                 Toast.makeText(this, "Logging out...", Toast.LENGTH_LONG).show()
-                intent = Intent(this, LoginActivity::class.java)
+                intent = Intent(this, LoginStudent::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()

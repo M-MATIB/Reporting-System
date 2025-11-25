@@ -14,7 +14,6 @@ import com.google.android.material.button.MaterialButton
 import android.widget.RadioGroup
 import android.widget.RadioButton
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 
 class StudentProfileActivity : AppCompatActivity() {
@@ -73,7 +72,7 @@ class StudentProfileActivity : AppCompatActivity() {
         else {
             // This is a safety net. If no user is logged in, redirect to the Login screen.
             Toast.makeText(this, "Error: User data not found. Please log in again.", Toast.LENGTH_LONG).show()
-            val intent = Intent(this, LoginActivity::class.java).apply {
+            val intent = Intent(this, LoginStudent::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             startActivity(intent)

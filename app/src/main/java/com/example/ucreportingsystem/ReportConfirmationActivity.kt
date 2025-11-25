@@ -3,7 +3,6 @@ package com.example.ucreportingsystem
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -150,7 +149,7 @@ class ReportConfirmationActivity : AppCompatActivity(), NavigationView.OnNavigat
                 return true
             }
             R.id.nav_logout -> {
-                val intent = Intent(this, LoginActivity::class.java)
+                val intent = Intent(this, LoginStudent::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(intent)
                 return true

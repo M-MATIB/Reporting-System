@@ -33,15 +33,12 @@ class StaffRegistrationActivity : AppCompatActivity() {
 
         //View Initialization
         StaffName = findViewById(R.id.et_full_name)
-        SchoolEmail = findViewById(R.id.et_school_email)
+        SchoolEmail = findViewById(R.id.et_school_id)
         CreatePassword = findViewById(R.id.et_create_password)
         ConfirmPassword = findViewById(R.id.et_confirm_password)
         Register = findViewById(R.id.btn_register)
 
-
-
         setupOfficeDropdown()
-        setupRoleToggle()
         setupFinalButtons()
         RegisterUser()
 
@@ -67,34 +64,15 @@ class StaffRegistrationActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRoleToggle() {
-        val toggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.toggle_role_group)
-
-        toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                when (checkedId) {
-                    R.id.btn_role_student -> {
-                        val intent = Intent(this, StudentRegistrationActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        startActivity(intent)
-                        finish()
-                    }
-                    R.id.btn_role_staff -> {
-                    }
-                }
-            }
-        }
-    }
-
     private fun setupFinalButtons() {
-        findViewById<Button>(R.id.btn_create_account).setOnClickListener {
+        findViewById<Button>(R.id.btn_toLogin).setOnClickListener {
             navigateToLogin()
         }
 
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, LoginStudent::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()

@@ -1,6 +1,8 @@
 package com.example.ucreportingsystem
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -22,13 +24,11 @@ object UserRepository {
         private set
 
     /**
-     * Searches for a user in the "Student" and "Staff" collections.
+     * Searches for a user in the "Student" collection.
      * If found, it populates 'currentUser' and 'userType'.
-     * The callback returns the type of user found ("Student", "Staff") or null if not found.
+     * The callback returns "Student" or null if not found.
      */
-
-    fun fetchUser(email: String, password: String, onComplete: (userRole: String?) -> Unit) {
-        // First, search in the "Student" collection
+    fun fetchStudent(email: String, password: String, context: Context, onComplete: (userRole: String?) -> Unit) {
         val db = Firebase.firestore
         db.collection("Student")
             .whereEqualTo("Email", email)
@@ -46,8 +46,8 @@ object UserRepository {
                     userType = "Student"
                     onComplete("Student")
                 } else {
-                    // If not found in Student, search in the "Staff" collection
-                    fetchStaff(email, password, onComplete)
+                    Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show() // Use the passed context
+                    onComplete(null) // Make sure to call onComplete
                 }
             }
             .addOnFailureListener { exception ->
@@ -56,7 +56,12 @@ object UserRepository {
             }
     }
 
-    private fun fetchStaff(email: String, password: String, onComplete: (userRole: String?) -> Unit) {
+    /**
+     * Searches for a user in the "Staff" collection.
+     * If found, it populates 'currentUser' and 'userType'.
+     * The callback returns "Staff" or null if not found.
+     */
+    fun fetchStaff(email: String, password: String, context: Context, onComplete: (userRole: String?) -> Unit) {
         val db = Firebase.firestore
         db.collection("Staff")
             .whereEqualTo("Email", email)
@@ -74,10 +79,8 @@ object UserRepository {
                     userType = "Staff"
                     onComplete("Staff")
                 } else {
-                    // User not found in either collection
-                    currentUser = null
-                    userType = null
-                    onComplete(null)
+                    Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show() // Use the passed context
+                    onComplete(null) // Make sure to call onComplete
                 }
             }
             .addOnFailureListener { exception ->
